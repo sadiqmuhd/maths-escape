@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character lab · Maths Escape</title>
+<style>html,body{margin:0;height:100%;background:#f4efe6;font-family:system-ui,sans-serif}canvas{display:block;width:100%;height:100%}#mode{position:fixed;top:10px;left:10px;display:flex;gap:6px}button{padding:6px 10px}</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js" } }</script>
+</head>
+<body>
+<div id="mode"></div>
+<canvas id="c"></canvas>
+<script type="module">
+// Development page: every hair, hat and accessory side by side, plus Mama.
+import * as THREE from 'three';
+import { buildCharacter } from '../src/character.js';
+import { buildMama } from '../src/mama.js';
+
+const looks = [
+  { body: 'female', hair: 'braids', hat: 'crown', accessory: 'earrings', primaryColor: '#a55eea', secondaryColor: '#0c6e5a', skinColor: '#8d5524' },
+  { body: 'male', hair: 'afro', hat: 'none', accessory: 'glasses', primaryColor: '#1dd1a1', secondaryColor: '#222f3e', skinColor: '#5c3a21' },
+  { body: 'female', hair: 'bun', hat: 'none', accessory: 'scarf', primaryColor: '#ff6b6b', secondaryColor: '#2b2f4a', skinColor: '#c68642' },
+  { body: 'male', hair: 'dreads', hat: 'beanie', accessory: 'backpack', primaryColor: '#f7b731', secondaryColor: '#4b6584', skinColor: '#a0662f' },
+  { body: 'female', hair: 'ponytail', hat: 'cap', accessory: 'none', primaryColor: '#4b7bec', secondaryColor: '#3d3d3d', skinColor: '#e0ac69', hairColor: '#8b5a2b' },
+  { body: 'male', hair: 'short', hat: 'tophat', accessory: 'beard', primaryColor: '#eb3b5a', secondaryColor: '#5f3dc4', skinColor: '#8d5524' },
+  { body: 'male', hair: 'bald', hat: 'none', accessory: 'none', primaryColor: '#292a23', secondaryColor: '#0c6e5a', skinColor: '#f1c27d' },
+  { body: 'female', hair: 'nonsense', hat: 'nonsense', primaryColor: 'blue' }, // unknown values fall back
+];
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#f4efe6');
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+camera.position.set(0, 1.6, 9.5);
+camera.lookAt(0, 0.95, 0);
+scene.add(new THREE.HemisphereLight('#ffffff', '#c9b79c', 1.6));
+const sun = new THREE.DirectionalLight('#ffffff', 2.2);
+sun.position.set(3, 6, 5);
+sun.castShadow = true;
+scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 20), new THREE.MeshStandardMaterial({ color: '#e7dccb' }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const people = looks.map((style, i) => {
+  const c = buildCharacter(style);
+  c.root.position.x = (i - (looks.length) / 2) * 0.62;
+  c.root.rotation.y = -0.25;
+  scene.add(c.root);
+  return c;
+});
+const mama = buildMama();
+mama.root.position.x = (looks.length / 2) * 0.62 + 0.15;
+mama.root.rotation.y = -0.5;
+scene.add(mama.root);
+people.push(mama);
+window.people = people;
+
+const modes = ['idle', 'run', 'stumble', 'caught', 'cheer', 'chase'];
+for (const m of modes) {
+  const b = document.createElement('button');
+  b.textContent = m;
+  b.onclick = () => people.forEach((p) => p.setMode(m));
+  document.getElementById('mode').append(b);
+}
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+let last = performance.now();
+renderer.setAnimationLoop((now) => {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  people.forEach((p) => p.update(dt));
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

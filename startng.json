@@ -1,0 +1,9 @@
+{
+  "leaderboard": {
+    "stats": [
+      { "key": "score", "label": "Score", "order": "highest" },
+      { "key": "correct", "label": "Correct answers", "order": "highest" },
+      { "key": "best_streak", "label": "Best streak", "order": "highest" }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "maths-escape",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Maths Escape: outrun Mama and her slipper with quick mental maths. A three.js game for start.ng.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Maths Escape · start.ng</title>
+  <meta name="description" content="You failed your maths homework and Mama is coming with her slipper. Answer quick maths to outrun her!">
+  <meta name="theme-color" content="#1f3d2b">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="scene" aria-label="Your character running from Mama down a Lagos street"></canvas>
+  <div id="vignette" aria-hidden="true"></div>
+  <div id="bubble" class="bubble" hidden aria-live="polite"></div>
+
+  <header class="topbar">
+    <div class="card" id="card">
+      <img id="face" alt="" hidden>
+      <span class="face-fallback" id="face-fallback" aria-hidden="true">?</span>
+      <div class="who">
+        <b id="player-name">Guest</b>
+        <span id="player-account">Not signed in</span>
+      </div>
+      <button type="button" class="pill" id="sign-in" hidden>Sign in</button>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="icon-btn" id="pause-btn" aria-label="Pause" hidden>⏸</button>
+      <button type="button" class="icon-btn" id="mute" aria-label="Sound on">🔊</button>
+    </div>
+  </header>
+
+  <section id="hud" hidden>
+    <div class="gap" aria-label="Distance from Mama">
+      <span class="gap-end" aria-hidden="true">🩴</span>
+      <div class="gap-track">
+        <div class="gap-fill" id="gap-fill"></div>
+        <span class="gap-runner" id="gap-runner" aria-hidden="true">🏃🏾</span>
+      </div>
+      <b class="gap-m" id="gap-m">10 m</b>
+    </div>
+
+    <div class="board" id="board">
+      <div class="meta">
+        <span id="level">Level 1</span>
+        <span id="streak" class="streak">🔥 0</span>
+        <span id="score">0 pts</span>
+      </div>
+      <div class="question" id="question" aria-live="assertive">7 + 5 = ?</div>
+      <div class="timer" aria-hidden="true"><i id="timer-fill"></i></div>
+    </div>
+
+    <div class="answers" id="answers" role="group" aria-label="Answers">
+      <button type="button" class="answer" data-i="0"><kbd>1</kbd><span>0</span></button>
+      <button type="button" class="answer" data-i="1"><kbd>2</kbd><span>0</span></button>
+      <button type="button" class="answer" data-i="2"><kbd>3</kbd><span>0</span></button>
+      <button type="button" class="answer" data-i="3"><kbd>4</kbd><span>0</span></button>
+    </div>
+  </section>
+
+  <div id="feedback" class="feedback" aria-live="polite"></div>
+  <div id="banner" class="banner" aria-live="polite"></div>
+
+  <div class="overlay" id="menu">
+    <div class="panel menu-panel">
+      <p class="eyebrow">A start.ng game</p>
+      <h1>Maths <span>Escape</span></h1>
+      <p class="tagline">You failed your maths homework… and Mama is coming with her slipper. 🩴</p>
+      <ul class="how">
+        <li><b>Right answer:</b> you pull ahead <em>(+3 m, +5 m if fast)</em></li>
+        <li><b>Wrong answer:</b> you stumble <em>(−3 m)</em></li>
+        <li><b>Mama keeps coming.</b> Don’t let her catch you!</li>
+      </ul>
+      <button type="button" class="big-btn" id="play">Run! <kbd>Enter</kbd></button>
+      <p class="guest-note" id="menu-guest" hidden>Playing as a guest. <button type="button" class="link" id="menu-sign-in">Sign in with start.ng</button> to save your score.</p>
+      <div class="lb" id="menu-lb" hidden>
+        <h2>Top runners</h2>
+        <ol id="menu-board"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay countdown" id="countdown" hidden><b id="count">3</b></div>
+
+  <div class="overlay" id="over" hidden>
+    <div class="panel over-panel">
+      <h1 class="caught-title">Mama caught you! 🩴</h1>
+      <div class="stats">
+        <div><b id="o-score">0</b><span>Score</span></div>
+        <div><b id="o-correct">0</b><span>Correct</span></div>
+        <div><b id="o-streak">0</b><span>Best streak</span></div>
+        <div><b id="o-time">0:00</b><span>Survived</span></div>
+      </div>
+      <p class="save" id="save-msg"></p>
+      <button type="button" class="big-btn" id="again">Run again <kbd>Enter</kbd></button>
+      <button type="button" class="pill" id="over-sign-in" hidden>Sign in to save your score</button>
+      <div class="lb" id="over-lb" hidden>
+        <h2>Leaderboard</h2>
+        <ol id="over-board"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="paused" hidden>
+    <div class="panel small-panel">
+      <h1>Paused</h1>
+      <p>Mama is waiting…</p>
+      <button type="button" class="big-btn" id="resume">Resume <kbd>Enter</kbd></button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

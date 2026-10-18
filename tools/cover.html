@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cover · Maths Escape</title>
+<style>body{margin:0;background:#222}canvas{display:block;max-width:100%}</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="out" width="1600" height="1000"></canvas>
+<script type="module">
+// Development page: renders cover.png (1600 × 1000) from the real game scene.
+// window.coverPng() returns it as base64.
+import * as THREE from 'three';
+import { buildWorld } from '../src/world.js';
+import { buildCharacter } from '../src/character.js';
+import { buildMama, throwSlipper } from '../src/mama.js';
+
+const W = 1600, H = 1000;
+const gl = document.createElement('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas: gl, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H, false);
+renderer.shadowMap.enabled = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+const world = buildWorld(scene);
+world.update(37); // a nice stretch of street
+
+const runner = buildCharacter({ body: 'female', primaryColor: '#a55eea', secondaryColor: '#0c6e5a', skinColor: '#8d5524', hairColor: '#17120f', hair: 'braids', hat: 'crown', accessory: 'earrings' });
+runner.root.rotation.y = Math.PI / 2;
+runner.setMode('run');
+runner.setSpeed(1.4);
+scene.add(runner.root);
+
+const mama = buildMama();
+mama.root.rotation.y = Math.PI / 2;
+mama.root.position.x = -3.6;
+scene.add(mama.root);
+
+const fly = throwSlipper(scene, new THREE.Vector3(-3.2, 2.2, 0.3), new THREE.Vector3(0.4, 1.4, 0.2));
+for (let i = 0; i < 22; i++) { runner.update(1 / 60); mama.update(1 / 60); }
+fly.update(0.1);
+fly.mesh.position.set(-1.7, 2.05, 0.1); // mid-air between them
+fly.mesh.rotation.set(0.6, 0.9, 1.9);
+
+const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 120);
+camera.position.set(4.3, 1.9, 2.6);
+camera.lookAt(-2.0, 1.25, 1.15); // characters to the right of the title
+renderer.render(scene, camera);
+
+const out = document.getElementById('out');
+const g = out.getContext('2d');
+g.drawImage(gl, 0, 0);
+// soft dark band on the left for the title
+const grad = g.createLinearGradient(0, 0, 900, 0);
+grad.addColorStop(0, 'rgba(20, 30, 22, .82)');
+grad.addColorStop(1, 'rgba(20, 30, 22, 0)');
+g.fillStyle = grad;
+g.fillRect(0, 0, 900, H);
+
+g.textBaseline = 'alphabetic';
+g.fillStyle = '#ffd23f';
+g.font = '900 54px system-ui, sans-serif';
+g.fillText('7 × 8 = ?', 80, 220);
+g.fillStyle = '#ffffff';
+g.font = '900 150px system-ui, sans-serif';
+g.fillText('Maths', 72, 400);
+g.fillStyle = '#ff7a2f';
+g.fillText('Escape', 72, 550);
+g.fillStyle = '#fffaf0';
+g.font = '700 46px system-ui, sans-serif';
+g.fillText('Answer fast. Mama is coming', 80, 650);
+g.fillText('with her slipper! 🩴', 80, 710);
+g.fillStyle = 'rgba(255,255,255,.75)';
+g.font = '800 32px system-ui, sans-serif';
+g.fillText('maths-escape.start.ng', 80, 900);
+
+window.coverPng = () => out.toDataURL('image/png').split(',')[1];
+window.coverReady = true;
+</script>
+</body>
+</html>
